@@ -5,7 +5,6 @@ import { MdDelete } from "react-icons/md";
 import { BsPinAngle } from "react-icons/bs";
 import { MdColorLens } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
-import PrimaryButton from "./Components/PrimaryButton";
 import { useState, useEffect } from "react"
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -16,6 +15,8 @@ const App = () => {
     const [todos, setTodos] = useState([])
     const [taskStatus, setTaskStatus] = useState(false)
     const [spinner, setSpinner] = useState(false)
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
 
     // Get Random Quote
     useEffect(() => {
@@ -48,7 +49,19 @@ const App = () => {
             toast.error("Please enter someting!");
             return
         }
-        else {
+        if (isEditing === true) {
+            const updatedNotes = todos.map((todo) => {
+                return todo.id === editId ? { ...todo, title: input, description: noteDesc, color: todo.color, date: todo.date, id: todo.id } : todo
+            })
+
+            setTodos(updatedNotes)
+            localStorage.setItem("Todos", JSON.stringify(updatedNotes))
+            toast.success("Note updated!");
+            setInput("")
+            setNoteDesc("")
+            setIsEditing(false);
+            setEditId(null);
+        } else {
             const colors = ["#FB2C36", "#FDC700", "#FF770F", "#0FFFCF", "#04FF00", "#00BFFF", "#FF00FF", "#9400D3", "#FF1493", "#00FF7F", "#1E90FF", "#FF4500", "#7CFC00", "#FFD700", "#FF69B4", "#00CED1", "#DC143C", "#32CD32", "#8A2BE2", "#FF6347", "#00FA9A", "#BA55D3", "#40E0D0", "#DAA520", "#FF8C00"];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
@@ -70,10 +83,27 @@ const App = () => {
             localStorage.setItem("Todos", JSON.stringify([newTodo, ...todos]))
             setInput("")
             setNoteDesc("")
+            toast.success("Note saved!");
         }
         document.getElementById("crud-modal")?.classList.add("hidden");
         document.querySelector('[class*="bg-gray-900"][class*="fixed"][class*="z-40"]')?.remove();
-        toast.success("Note saved!");
+    }
+
+    // Handle Edit Note
+    const handleEditNote = (todo) => {
+        setIsEditing(true)
+        setEditId(todo.id)
+        setInput(todo.title)
+        setNoteDesc(todo.description)
+        document.getElementById("model-trigger")?.click();
+    }
+
+    // Handle Delete Specific Note
+    const handleDeleteNote = (todo) => {
+        const updateNotes = todos.filter((note) => note.id !== todo.id)
+        setTodos(updateNotes)
+        localStorage.setItem("Todos", JSON.stringify(updateNotes))
+        toast.success("Note deleted!");
     }
 
     // Deleting All Notes
@@ -127,7 +157,7 @@ const App = () => {
 
                                                     <textarea id="description" rows="4" className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:border-yellow-500 focus:bg-transparent focus:ring-2 focus:ring-yellow-200 mb-4 shadow" onChange={handleNoteDesc} value={noteDesc} placeholder="Write note description..."></textarea>
 
-                                                    <button onClick={handleAddTodo} className="flex mx-auto text-white bg-yellow-400 border-0 my-2 py-1 px-4 focus:outline-none hover:bg-yellow-600 rounded text-lg cursor-pointer drop-shadow-[2px_2px_0_rgb(220,167,0)] w-fit">Create Note</button>
+                                                    <button onClick={handleAddTodo} className="flex mx-auto text-white bg-yellow-400 border-0 my-2 py-1 px-4 focus:outline-none hover:bg-yellow-600 rounded text-lg cursor-pointer drop-shadow-[2px_2px_0_rgb(220,167,0)] w-fit">{isEditing ? "Update Note" : "Create Note"}</button>
 
                                                 </div>
                                             </div>
@@ -163,7 +193,7 @@ const App = () => {
                                         <div className="relative flex items-center justify-between px-4 py-2 ">
                                             {/* Left side: Delete icon */}
                                             <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                <span className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                     <MdDelete className="w-5 h-5 text-gray-800 hover:text-red-600" />
                                                 </span>
                                                 <span className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
@@ -173,7 +203,7 @@ const App = () => {
 
                                             {/* Right side: Color & Pin icons */}
                                             <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                <span className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
+                                                <span onClick={() => { handleEditNote(todo) }} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
                                                     <MdEdit className="w-5 h-5 text-gray-800" />
                                                 </span>
                                                 <span className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
