@@ -22,6 +22,9 @@ const App = () => {
 
     const colors = ["#FB2C36", "#FDC700", "#FF770F", "#0FFFCF", "#04FF00", "#00BFFF", "#FF00FF", "#9400D3", "#FF1493", "#00FF7F", "#1E90FF", "#FF4500", "#7CFC00", "#FFD700", "#FF69B4", "#00CED1", "#DC143C", "#32CD32", "#8A2BE2", "#FF6347", "#00FA9A", "#BA55D3", "#40E0D0", "#DAA520", "#FF8C00"];
 
+    const pinnedNotes = todos.filter((note) => note.pinned);
+    const unpinnedNotes = todos.filter((note) => !note.pinned);
+
     useEffect(() => {
         const modal = document.getElementById("crud-modal");
 
@@ -99,6 +102,7 @@ const App = () => {
                 title: input,
                 description: noteDesc,
                 color: randomColor,
+                pinned: false,
                 date: new Date().toLocaleString("en-US", {
                     month: "long",
                     day: "numeric",
@@ -154,7 +158,18 @@ const App = () => {
         localStorage.setItem("Todos", JSON.stringify(updatedNotes))
         setShowColorModal(false);
         toast.success("Note color changed!");
-        setActiveNoteId(null); // reset
+        setActiveNoteId(null);
+    }
+
+    // Handle Pinned Notes
+    const handlePinnedNotes = (todoId) => {
+        const updatedNotes = todos.map((note) =>
+            note.id === todoId ? { ...note, pinned: !note.pinned } : note
+        )
+
+        setTodos(updatedNotes);
+        localStorage.setItem("Todos", JSON.stringify(updatedNotes));
+        toast.success("Note " + (updatedNotes.find(n => n.id === todoId).pinned ? "pinned!" : "unpinned!"));
     }
 
     // Deleting All Notes
@@ -231,72 +246,151 @@ const App = () => {
                             <img src="/light-bulb.svg" alt="No Notes Png" className="light_bulb mx-auto opacity-35 pointer-events-none select-none" width={120} />
                             <p className="text-gray-400">Notes that you add appear here!</p>
                         </span>)}
-                        {todos.map(todo => {
-                            return (
-                                <div key={todo.id} className="p-2 lg:w-1/4 group">
-                                    <div className="h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center relative hover:shadow-lg">
-                                        <div className="w-full flex items-center justify-end h-2 mb-4" style={{ backgroundColor: todo.color }}>
-                                        </div>
-                                        <h2 className="title-font sm:text-2xl text-xl text-gray-700 mb-3">{todo.title}</h2>
-                                        <p className="leading-relaxed mb-3">{todo.description}</p>
-                                        <p className="leading-relaxed mb-3 text-gray-400">{todo.date}</p>
-                                        <div className="relative flex items-center justify-between px-4 py-2 ">
-                                            {/* Left side: Delete icon */}
-                                            <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                    <MdDelete className="w-5 h-5 text-gray-800 hover:text-red-600" />
-                                                </span>
-                                                <span
-                                                    onClick={() => handleChangeColor(todo)}
-                                                    className="p-2 hover:bg-gray-300 rounded-full cursor-pointer"
-                                                >
-                                                    <MdColorLens className="w-5 h-5 text-gray-800" />
-                                                </span>
-                                            </div>
 
-                                            {showColorModal && (
-                                                <div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-full bg-gray-600/20
- flex justify-center items-center">
-                                                    <div className="bg-white rounded-lg shadow w-full max-w-md">
-                                                        <div className="flex items-start justify-between p-4 rounded-t">
-                                                            <h3 className="text-xl font-semibold">Change the Color</h3>
-                                                            <button
-                                                                onClick={() => setShowColorModal(false)}
-                                                                className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+                        {pinnedNotes.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-2">📌 Pinned</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {pinnedNotes.map(todo => {
+                                        return (
+                                            <div key={todo.id} className="p-2 lg:w-1/4 group">
+                                                <div className="h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center relative hover:shadow-lg">
+                                                    <div className="w-full flex items-center justify-end h-2 mb-4" style={{ backgroundColor: todo.color }}>
+                                                    </div>
+                                                    <h2 className="title-font sm:text-2xl text-xl text-gray-700 mb-3">{todo.title}</h2>
+                                                    <p className="leading-relaxed mb-3">{todo.description}</p>
+                                                    <p className="leading-relaxed mb-3 text-gray-400">{todo.date}</p>
+                                                    <div className="relative flex items-center justify-between px-4 py-2 ">
+                                                        {/* Left side: Delete icon */}
+                                                        <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                            <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                                <MdDelete className="w-5 h-5 text-gray-800 hover:text-red-600" />
+                                                            </span>
+                                                            <span
+                                                                onClick={() => handleChangeColor(todo)}
+                                                                className="p-2 hover:bg-gray-300 rounded-full cursor-pointer"
                                                             >
-                                                                ✕
-                                                            </button>
+                                                                <MdColorLens className="w-5 h-5 text-gray-800" />
+                                                            </span>
                                                         </div>
-                                                        <div className="p-6 flex flex-wrap gap-3 justify-center">
-                                                            {colors.map((color, index) => (
-                                                                <button
-                                                                    key={index}
-                                                                    onClick={() => handleModalNotesColor(color)}
-                                                                    className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-black cursor-pointer"
-                                                                    style={{ backgroundColor: color }}
-                                                                />
-                                                            ))}
+
+                                                        {showColorModal && (
+                                                            <div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-full bg-gray-600/20
+         flex justify-center items-center">
+                                                                <div className="bg-white rounded-lg shadow w-full max-w-md">
+                                                                    <div className="flex items-start justify-between p-4 rounded-t">
+                                                                        <h3 className="text-xl font-semibold">Change the Color</h3>
+                                                                        <button
+                                                                            onClick={() => setShowColorModal(false)}
+                                                                            className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="p-6 flex flex-wrap gap-3 justify-center">
+                                                                        {colors.map((color, index) => (
+                                                                            <button
+                                                                                key={index}
+                                                                                onClick={() => handleModalNotesColor(color)}
+                                                                                className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-black cursor-pointer"
+                                                                                style={{ backgroundColor: color }}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+
+                                                        {/* Right side: Color & Pin icons */}
+                                                        <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                            <span onClick={() => { handleEditNote(todo) }} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
+                                                                <MdEdit className="w-5 h-5 text-gray-800" />
+                                                            </span>
+                                                            <span onClick={() => handlePinnedNotes(todo.id)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
+                                                                <BsPinAngle className={`w-5 h-5 ${todo.pinned ? "text-yellow-500" : "text-gray-800"}`} />
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            )}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                    </div>
+                    {unpinnedNotes.length > 0 && (
+                        <div>
+                            <h2 className="text-lg font-semibold mb-2">Notes</h2>
+                            {unpinnedNotes.map(todo => {
+                                return (
+                                    <div key={todo.id} className="p-2 lg:w-1/4 group">
+                                        <div className="h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center relative hover:shadow-lg">
+                                            <div className="w-full flex items-center justify-end h-2 mb-4" style={{ backgroundColor: todo.color }}>
+                                            </div>
+                                            <h2 className="title-font sm:text-2xl text-xl text-gray-700 mb-3">{todo.title}</h2>
+                                            <p className="leading-relaxed mb-3">{todo.description}</p>
+                                            <p className="leading-relaxed mb-3 text-gray-400">{todo.date}</p>
+                                            <div className="relative flex items-center justify-between px-4 py-2 ">
+                                                {/* Left side: Delete icon */}
+                                                <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                    <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                        <MdDelete className="w-5 h-5 text-gray-800 hover:text-red-600" />
+                                                    </span>
+                                                    <span
+                                                        onClick={() => handleChangeColor(todo)}
+                                                        className="p-2 hover:bg-gray-300 rounded-full cursor-pointer"
+                                                    >
+                                                        <MdColorLens className="w-5 h-5 text-gray-800" />
+                                                    </span>
+                                                </div>
+
+                                                {showColorModal && (
+                                                    <div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-full bg-gray-600/20
+         flex justify-center items-center">
+                                                        <div className="bg-white rounded-lg shadow w-full max-w-md">
+                                                            <div className="flex items-start justify-between p-4 rounded-t">
+                                                                <h3 className="text-xl font-semibold">Change the Color</h3>
+                                                                <button
+                                                                    onClick={() => setShowColorModal(false)}
+                                                                    className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                                            </div>
+                                                            <div className="p-6 flex flex-wrap gap-3 justify-center">
+                                                                {colors.map((color, index) => (
+                                                                    <button
+                                                                        key={index}
+                                                                        onClick={() => handleModalNotesColor(color)}
+                                                                        className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-black cursor-pointer"
+                                                                        style={{ backgroundColor: color }}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
 
 
-                                            {/* Right side: Color & Pin icons */}
-                                            <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                <span onClick={() => { handleEditNote(todo) }} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
-                                                    <MdEdit className="w-5 h-5 text-gray-800" />
-                                                </span>
-                                                <span className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
-                                                    <BsPinAngle className="w-5 h-5 text-gray-800" />
-                                                </span>
+                                                {/* Right side: Color & Pin icons */}
+                                                <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                    <span onClick={() => { handleEditNote(todo) }} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
+                                                        <MdEdit className="w-5 h-5 text-gray-800" />
+                                                    </span>
+                                                    <span onClick={() => handlePinnedNotes(todo.id)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
+                                                        <BsPinAngle className={`w-5 h-5 ${todo.pinned ? "text-yellow-500" : "text-gray-800"}`} />
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            )
-                        })}
-                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
                 </div>
             </section>
             <Footer />
