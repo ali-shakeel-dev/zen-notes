@@ -17,6 +17,35 @@ const App = () => {
     const [spinner, setSpinner] = useState(false)
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [activeNoteId, setActiveNoteId] = useState(null);
+    const [showColorModal, setShowColorModal] = useState(false);
+
+    const colors = ["#FB2C36", "#FDC700", "#FF770F", "#0FFFCF", "#04FF00", "#00BFFF", "#FF00FF", "#9400D3", "#FF1493", "#00FF7F", "#1E90FF", "#FF4500", "#7CFC00", "#FFD700", "#FF69B4", "#00CED1", "#DC143C", "#32CD32", "#8A2BE2", "#FF6347", "#00FA9A", "#BA55D3", "#40E0D0", "#DAA520", "#FF8C00"];
+
+    useEffect(() => {
+        const modal = document.getElementById("crud-modal");
+
+        const resetModalState = () => {
+            setInput("");
+            setNoteDesc("");
+            setIsEditing(false);
+            setEditId(null);
+        };
+
+        // Flowbite uses "hidden.bs.modal" but for CDN-based modal, it just toggles classes
+        const observer = new MutationObserver(() => {
+            if (modal?.classList.contains("hidden")) {
+                resetModalState();
+            }
+        });
+
+        if (modal) {
+            observer.observe(modal, { attributes: true, attributeFilter: ["class"] });
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
 
     // Get Random Quote
     useEffect(() => {
@@ -81,12 +110,13 @@ const App = () => {
 
             setTodos([newTodo, ...todos])
             localStorage.setItem("Todos", JSON.stringify([newTodo, ...todos]))
-            setInput("")
-            setNoteDesc("")
             toast.success("Note saved!");
         }
-        document.getElementById("crud-modal")?.classList.add("hidden");
-        document.querySelector('[class*="bg-gray-900"][class*="fixed"][class*="z-40"]')?.remove();
+        setInput("")
+        setNoteDesc("")
+        document
+            .querySelector('#crud-modal [data-modal-toggle="crud-modal"]')
+            ?.click();
     }
 
     // Handle Edit Note
@@ -96,6 +126,9 @@ const App = () => {
         setInput(todo.title)
         setNoteDesc(todo.description)
         document.getElementById("model-trigger")?.click();
+        document
+            .querySelector('#color-modal [data-modal-toggle="color-modal"]')
+            ?.click();
     }
 
     // Handle Delete Specific Note
@@ -104,6 +137,24 @@ const App = () => {
         setTodos(updateNotes)
         localStorage.setItem("Todos", JSON.stringify(updateNotes))
         toast.success("Note deleted!");
+    }
+
+    // Handle Change Color
+    const handleChangeColor = (todo) => {
+        setActiveNoteId(todo.id)
+        setShowColorModal(true);
+    }
+
+    // Catch what color user selects
+    const handleModalNotesColor = (selectedNoteColor) => {
+        const updatedNotes = todos.map((todo) => {
+            return todo.id === activeNoteId ? { ...todo, color: selectedNoteColor } : todo
+        })
+        setTodos(updatedNotes)
+        localStorage.setItem("Todos", JSON.stringify(updatedNotes))
+        setShowColorModal(false);
+        toast.success("Note color changed!");
+        setActiveNoteId(null); // reset
     }
 
     // Deleting All Notes
@@ -173,8 +224,7 @@ const App = () => {
                 </div>
             </section>
 
-            <section className="text-gray-600 body-font h-100">
-
+            <section className="text-gray-600 body-font min-h-100">
                 <div className="lg:w-2/3 w-full container px-5 py-5 mx-auto">
                     <div className="flex flex-wrap -m-4">
                         {todos <= 0 && (<span id="empty-message" className="w-full flex text-center justify-center items-center flex-col  gap-4">
@@ -196,10 +246,41 @@ const App = () => {
                                                 <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                     <MdDelete className="w-5 h-5 text-gray-800 hover:text-red-600" />
                                                 </span>
-                                                <span className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
-                                                    <MdColorLens className="block w-5 h-5 text-gray-800" />
+                                                <span
+                                                    onClick={() => handleChangeColor(todo)}
+                                                    className="p-2 hover:bg-gray-300 rounded-full cursor-pointer"
+                                                >
+                                                    <MdColorLens className="w-5 h-5 text-gray-800" />
                                                 </span>
                                             </div>
+
+                                            {showColorModal && (
+                                                <div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-full bg-gray-600/20
+ flex justify-center items-center">
+                                                    <div className="bg-white rounded-lg shadow w-full max-w-md">
+                                                        <div className="flex items-start justify-between p-4 border-b rounded-t">
+                                                            <h3 className="text-xl font-semibold">Change the Color</h3>
+                                                            <button
+                                                                onClick={() => setShowColorModal(false)}
+                                                                className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                        <div className="p-6 flex flex-wrap gap-3">
+                                                            {colors.map((color, index) => (
+                                                                <button
+                                                                    key={index}
+                                                                    onClick={() => handleModalNotesColor(color)}
+                                                                    className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-black cursor-pointer"
+                                                                    style={{ backgroundColor: color }}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
 
                                             {/* Right side: Color & Pin icons */}
                                             <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -218,8 +299,8 @@ const App = () => {
                     </div>
                 </div>
             </section>
-            <ToastContainer />
             <Footer />
+            <ToastContainer />
         </>
     )
 }
