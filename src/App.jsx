@@ -49,14 +49,14 @@ const App = () => {
 
     // Get Random Quote
     useEffect(() => {
-        // setSpinner(true)
-        // fetch('https://dummyjson.com/quotes/random')
-        //     .then((res) => res.json())
-        //     .then((data) => {
-        //         setQuote(data)
-        //         setSpinner(false)
-        //     })
-        //     .catch((err) => console.error("Failed to fetch quote:", err));
+        setSpinner(true)
+        fetch('https://dummyjson.com/quotes/random')
+            .then((res) => res.json())
+            .then((data) => {
+                setQuote(data)
+                setSpinner(false)
+            })
+            .catch((err) => console.error("Failed to fetch quote:", err));
 
         let allTodos = JSON.parse(localStorage.getItem("Todos")) || []
         setTodos(allTodos)
@@ -228,7 +228,7 @@ const App = () => {
                 <div className="lg:w-2/3 w-full container px-5 py-5 mx-auto">
                     <div className="flex flex-wrap -m-4">
                         {todos <= 0 && (<span id="empty-message" className="w-full flex text-center justify-center items-center flex-col  gap-4">
-                            <img src="./src/assets/light-bulb.svg" alt="No Notes Png" className="light_bulb mx-auto opacity-35 pointer-events-none select-none" width={120} />
+                            <img src="/light-bulb.svg" alt="No Notes Png" className="light_bulb mx-auto opacity-35 pointer-events-none select-none" width={120} />
                             <p className="text-gray-400">Notes that you add appear here!</p>
                         </span>)}
                         {todos.map(todo => {

@@ -7,7 +7,7 @@ function Footer() {
         <div className="container px-5 py-4 mx-auto flex md:items-center md:flex-row md:flex-nowrap flex-wrap flex-col items-center justify-between">
           <div className="w-64 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left ">
             <a href='/' className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-              <img src="./src/assets/ZenNotes_Logo.png" alt="ZenNotes Logo" width={60} className="select-none pointer-events-none" />
+              <img src="/ZenNotes_Logo.png" alt="ZenNotes Logo" width={60} className="select-none pointer-events-none" />
               <span className="ml-3 text-xl">ZenNotes</span>
             </a>
             <p className="mt-2 text-sm text-gray-500">A simple and fast notes app to jot down ideas, organize thoughts, and never forget what matters.</p>
