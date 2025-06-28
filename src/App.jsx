@@ -173,7 +173,7 @@ const App = () => {
                         <h1 className="text-5xl font-extrabold text-yellow-400 drop-shadow-[2px_2px_0_rgb(220,167,0)]">Your Daily Notes</h1>
 
                         <span className="flex items-center justify-center py-4">
-                            {spinner ? (<span><img src="./src/assets/spinner.gif" alt="Spinner" width={100} /></span>) : (<blockquote className="text-center mb-6 text-gray-500 quote">&ldquo;{quote.quote}&rdquo; &mdash; <footer className="author">{quote.author}</footer>
+                            {spinner ? (<span><img src="/spinner.gif" alt="Spinner" width={100} /></span>) : (<blockquote className="text-center mb-6 text-gray-500 quote">&ldquo;{quote.quote}&rdquo; &mdash; <footer className="author">{quote.author}</footer>
                             </blockquote>)}
                         </span>
                     </div>
@@ -258,7 +258,7 @@ const App = () => {
                                                 <div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-full bg-gray-600/20
  flex justify-center items-center">
                                                     <div className="bg-white rounded-lg shadow w-full max-w-md">
-                                                        <div className="flex items-start justify-between p-4 border-b rounded-t">
+                                                        <div className="flex items-start justify-between p-4 rounded-t">
                                                             <h3 className="text-xl font-semibold">Change the Color</h3>
                                                             <button
                                                                 onClick={() => setShowColorModal(false)}
@@ -267,7 +267,7 @@ const App = () => {
                                                                 ✕
                                                             </button>
                                                         </div>
-                                                        <div className="p-6 flex flex-wrap gap-3">
+                                                        <div className="p-6 flex flex-wrap gap-3 justify-center">
                                                             {colors.map((color, index) => (
                                                                 <button
                                                                     key={index}
