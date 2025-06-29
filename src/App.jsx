@@ -267,7 +267,7 @@ const App = () => {
                                                     <h2 className="title-font sm:text-2xl text-xl text-gray-700 mb-3">{todo.title}</h2>
                                                     <p className="leading-relaxed mb-3 px-4">{todo.description}</p>
                                                     <p className="leading-relaxed mb-15 px-4 text-gray-400">{todo.date}</p>
-                                                    <div className="absolute w-full bottom-0  flex items-center justify-between px-4 py-2 ">
+                                                    <div className="absolute w-full bottom-0 flex items-center justify-between px-4 py-2">
                                                         {/* Left side: Delete icon */}
                                                         <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                             <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -339,14 +339,14 @@ const App = () => {
                                 {
                                     unpinnedNotes.map(todo => {
                                         return (
-                                            <div key={todo.id} className="w-full group">
-                                                <div className="h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center relative hover:shadow-lg">
+                                            <div key={todo.id} className="relative w-full group">
+                                                <div className="relative h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center hover:shadow-lg">
                                                     <div className="w-full flex items-center justify-end h-2 mb-4" style={{ backgroundColor: todo.color }}>
                                                     </div>
                                                     <h2 className="title-font sm:text-2xl text-xl text-gray-700 mb-3">{todo.title}</h2>
-                                                    <p className="leading-relaxed mb-3">{todo.description}</p>
-                                                    <p className="leading-relaxed mb-3 text-gray-400">{todo.date}</p>
-                                                    <div className="relative flex items-center justify-between px-4 py-2 ">
+                                                    <p className="leading-relaxed mb-3 px-4">{todo.description}</p>
+                                                    <p className="leading-relaxed mb-15 px-4 text-gray-400">{todo.date}</p>
+                                                    <div className="absolute flex w-full bottom-0 items-center justify-between px-4 py-2">
                                                         {/* Left side: Delete icon */}
                                                         <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                             <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
