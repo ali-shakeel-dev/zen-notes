@@ -2,7 +2,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import { MdDelete } from "react-icons/md";
-import { BsPinAngle } from "react-icons/bs";
+import { BsPinAngle, BsPinFill } from "react-icons/bs";
 import { MdColorLens } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
 import { useState, useEffect } from "react"
@@ -13,7 +13,6 @@ const App = () => {
     const [noteDesc, setNoteDesc] = useState("")
     const [quote, setQuote] = useState("")
     const [todos, setTodos] = useState([])
-    const [taskStatus, setTaskStatus] = useState(false)
     const [spinner, setSpinner] = useState(false)
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
@@ -192,7 +191,7 @@ const App = () => {
                             </blockquote>)}
                         </span>
                     </div>
-                    <div className="flex lg:w-2/3 w-full sm:flex-row flex-col mx-auto px-8 sm:space-x-4 sm:space-y-0 space-y-4 sm:px-0 items-end">
+                    <div className="flex lg:w-2/3 w-full sm:flex-row flex-col mx-auto sm:space-x-4 sm:space-y-0 space-y-4 sm:px-0 items-end">
 
                         <input id="model-trigger" data-modal-target="crud-modal" data-modal-toggle="crud-modal" className="w-full bg-opacity-50 rounded border border-gray-300 text-base outline-none px-4 p-3 leading-8 transition-colors duration-200 ease-in-out cursor-pointer shadow-md" placeholder="Enter a task..." readOnly />
 
@@ -235,25 +234,33 @@ const App = () => {
 
                         {/* Model ends */}
                     </div>
-                    {todos.length > 0 && (<button className="text-red-600 hover:text-red-700 underline focus:outline-none text-lg cursor-pointer" onClick={deleteAllTodos}>Delete All Todos</button>)}
+
+
+
+                </div>
+
+                <div className="lg:w-2/3 w-full container  items-end mx-auto px-5">
+                    {todos.length > 0 && (<button className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 hover:shadow-md focus:outline-none text-lg cursor-pointer flex items-center justify-center gap-1" onClick={deleteAllTodos}>
+                        <MdDelete className="w-5 h-5" />
+                        <p className="hidden sm:block">Delete All Notes</p>
+                    </button>)}
                 </div>
             </section>
 
             <section className="text-gray-600 body-font min-h-100">
                 <div className="lg:w-2/3 w-full container px-5 py-5 mx-auto">
-                    <div className="flex flex-wrap -m-4">
+                    <div className="flex flex-wrap mb-4">
                         {todos <= 0 && (<span id="empty-message" className="w-full flex text-center justify-center items-center flex-col  gap-4">
                             <img src="/light-bulb.svg" alt="No Notes Png" className="light_bulb mx-auto opacity-35 pointer-events-none select-none" width={120} />
                             <p className="text-gray-400">Notes that you add appear here!</p>
                         </span>)}
-
                         {pinnedNotes.length > 0 && (
-                            <div>
-                                <h2 className="text-lg font-semibold mb-2">📌 Pinned</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className='w-full container py-5 mx-auto'>
+                                <h2 className="text-lg font-semibold mb-2 text-gray-400">Pinned</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-3 gap-4">
                                     {pinnedNotes.map(todo => {
                                         return (
-                                            <div key={todo.id} className="p-2 lg:w-1/4 group">
+                                            <div key={todo.id} className=" w-full group">
                                                 <div className="h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center relative hover:shadow-lg">
                                                     <div className="w-full flex items-center justify-end h-2 mb-4" style={{ backgroundColor: todo.color }}>
                                                     </div>
@@ -308,7 +315,11 @@ const App = () => {
                                                                 <MdEdit className="w-5 h-5 text-gray-800" />
                                                             </span>
                                                             <span onClick={() => handlePinnedNotes(todo.id)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
-                                                                <BsPinAngle className={`w-5 h-5 ${todo.pinned ? "text-yellow-500" : "text-gray-800"}`} />
+                                                                {todo.pinned ? (
+                                                                    <BsPinFill className="w-5 h-5 text-gray-800 rotate-45" />
+                                                                ) : (
+                                                                    <BsPinAngle className="w-5 h-5 text-gray-800" />
+                                                                )}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -319,76 +330,81 @@ const App = () => {
                                 </div>
                             </div>
                         )}
-
                     </div>
-                    {unpinnedNotes.length > 0 && (
-                        <div>
-                            <h2 className="text-lg font-semibold mb-2">Notes</h2>
-                            {unpinnedNotes.map(todo => {
-                                return (
-                                    <div key={todo.id} className="p-2 lg:w-1/4 group">
-                                        <div className="h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center relative hover:shadow-lg">
-                                            <div className="w-full flex items-center justify-end h-2 mb-4" style={{ backgroundColor: todo.color }}>
-                                            </div>
-                                            <h2 className="title-font sm:text-2xl text-xl text-gray-700 mb-3">{todo.title}</h2>
-                                            <p className="leading-relaxed mb-3">{todo.description}</p>
-                                            <p className="leading-relaxed mb-3 text-gray-400">{todo.date}</p>
-                                            <div className="relative flex items-center justify-between px-4 py-2 ">
-                                                {/* Left side: Delete icon */}
-                                                <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                    <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                        <MdDelete className="w-5 h-5 text-gray-800 hover:text-red-600" />
-                                                    </span>
-                                                    <span
-                                                        onClick={() => handleChangeColor(todo)}
-                                                        className="p-2 hover:bg-gray-300 rounded-full cursor-pointer"
-                                                    >
-                                                        <MdColorLens className="w-5 h-5 text-gray-800" />
-                                                    </span>
-                                                </div>
 
-                                                {showColorModal && (
-                                                    <div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-full bg-gray-600/20
+                    {unpinnedNotes.length > 0 && (
+                        <div className='w-full container py-5 mx-auto'>
+                            <h2 className="text-lg font-semibold mb-2 text-gray-400">Notes</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                {
+                                    unpinnedNotes.map(todo => {
+                                        return (
+                                            <div key={todo.id} className="w-full group">
+                                                <div className="h-full border border-gray-300 bg-opacity-75 rounded-lg overflow-hidden text-center relative hover:shadow-lg">
+                                                    <div className="w-full flex items-center justify-end h-2 mb-4" style={{ backgroundColor: todo.color }}>
+                                                    </div>
+                                                    <h2 className="title-font sm:text-2xl text-xl text-gray-700 mb-3">{todo.title}</h2>
+                                                    <p className="leading-relaxed mb-3">{todo.description}</p>
+                                                    <p className="leading-relaxed mb-3 text-gray-400">{todo.date}</p>
+                                                    <div className="relative flex items-center justify-between px-4 py-2 ">
+                                                        {/* Left side: Delete icon */}
+                                                        <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                            <span onClick={() => handleDeleteNote(todo)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                                <MdDelete className="w-5 h-5 text-gray-800 hover:text-red-600" />
+                                                            </span>
+                                                            <span
+                                                                onClick={() => handleChangeColor(todo)}
+                                                                className="p-2 hover:bg-gray-300 rounded-full cursor-pointer"
+                                                            >
+                                                                <MdColorLens className="w-5 h-5 text-gray-800" />
+                                                            </span>
+                                                        </div>
+
+                                                        {showColorModal && (
+                                                            <div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-full bg-gray-600/20
          flex justify-center items-center">
-                                                        <div className="bg-white rounded-lg shadow w-full max-w-md">
-                                                            <div className="flex items-start justify-between p-4 rounded-t">
-                                                                <h3 className="text-xl font-semibold">Change the Color</h3>
-                                                                <button
-                                                                    onClick={() => setShowColorModal(false)}
-                                                                    className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
-                                                                >
-                                                                    ✕
-                                                                </button>
+                                                                <div className="bg-white rounded-lg shadow w-full max-w-md">
+                                                                    <div className="flex items-start justify-between p-4 rounded-t">
+                                                                        <h3 className="text-xl font-semibold">Change the Color</h3>
+                                                                        <button
+                                                                            onClick={() => setShowColorModal(false)}
+                                                                            className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="p-6 flex flex-wrap gap-3 justify-center">
+                                                                        {colors.map((color, index) => (
+                                                                            <button
+                                                                                key={index}
+                                                                                onClick={() => handleModalNotesColor(color)}
+                                                                                className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-black cursor-pointer"
+                                                                                style={{ backgroundColor: color }}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className="p-6 flex flex-wrap gap-3 justify-center">
-                                                                {colors.map((color, index) => (
-                                                                    <button
-                                                                        key={index}
-                                                                        onClick={() => handleModalNotesColor(color)}
-                                                                        className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-black cursor-pointer"
-                                                                        style={{ backgroundColor: color }}
-                                                                    />
-                                                                ))}
-                                                            </div>
+                                                        )}
+
+
+                                                        {/* Right side: Color & Pin icons */}
+                                                        <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                            <span onClick={() => { handleEditNote(todo) }} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
+                                                                <MdEdit className="w-5 h-5 text-gray-800" />
+                                                            </span>
+                                                            <span onClick={() => handlePinnedNotes(todo.id)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
+                                                                <BsPinAngle className={`w-5 h-5 ${todo.pinned ? "text-gray-500" : "text-gray-800"}`} />
+                                                            </span>
                                                         </div>
                                                     </div>
-                                                )}
-
-
-                                                {/* Right side: Color & Pin icons */}
-                                                <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                    <span onClick={() => { handleEditNote(todo) }} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
-                                                        <MdEdit className="w-5 h-5 text-gray-800" />
-                                                    </span>
-                                                    <span onClick={() => handlePinnedNotes(todo.id)} className="p-2 hover:bg-gray-300 rounded-full cursor-pointer">
-                                                        <BsPinAngle className={`w-5 h-5 ${todo.pinned ? "text-yellow-500" : "text-gray-800"}`} />
-                                                    </span>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                )
-                            })}
+                                        )
+                                    })
+                                }
+                            </div>
+
                         </div>
                     )}
                 </div>
